@@ -1,34 +1,36 @@
-package udp;
+package udp1;
 
 import java.io.*;
 import java.net.*;
 
 public class Client {
-    public static void main(String args[]) throws Exception {
-        DatagramSocket clientSocket = new DatagramSocket();
-        InetAddress IPAddress = InetAddress.getByName("localhost");
-        int serverPort = 9876;
+    public static void main(String[] args) {
+        String filePath = "img2.png"; // Path to your file
+        String host = "127.0.0.1"; // Destination host
+        int port = 12345; // Destination port
+        int bufferSize = 125; // Adjust buffer size as needed
 
-        // Read the file into a byte array
-        File file = new File("example.txt");
-        FileInputStream fis = new FileInputStream(file);
-        byte[] sendData = new byte[(int) file.length()];
-        fis.read(sendData);
-        fis.close();
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            InetAddress address = InetAddress.getByName(host);
 
-        // Send the byte array over UDP
-        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, serverPort);
-        clientSocket.send(sendPacket);
+            File file = new File(filePath);
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
 
-        // Receive acknowledgment from the server
-        byte[] receiveData = new byte[1024];
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        
-        // Convert acknowledgment data to String and print it
-        String ackMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
-        System.out.println("ACK from server: " + ackMessage);
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                DatagramPacket packet = new DatagramPacket(buffer, bytesRead, address, port);
+                socket.send(packet);
+                // Clear the buffer for the next packet
+                buffer = new byte[bufferSize];
+            }
 
-        clientSocket.close();
+            fileInputStream.close();
+            socket.close();
+            System.out.println("File sent successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
