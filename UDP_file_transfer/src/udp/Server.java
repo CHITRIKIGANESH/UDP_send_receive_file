@@ -1,9 +1,9 @@
-package udp1;
+package udp2;
 
 import java.io.*;
 import java.net.*;
 
-public class Server {
+public class Server2 {
     public static void main(String[] args) {
         int port = 12345; // Port to listen on
         int bufferSize = 125; // Adjust buffer size as needed
@@ -15,6 +15,12 @@ public class Server {
 
             System.out.println("Server is running. Waiting for data...");
 
+            // Receive the file name first
+            DatagramPacket fileNamePacket = new DatagramPacket(buffer, buffer.length);
+            socket.receive(fileNamePacket);
+            String fileName = new String(fileNamePacket.getData(), 0, fileNamePacket.getLength());
+
+            // Receive the file data
             while (true) {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
@@ -27,7 +33,7 @@ public class Server {
                 }
             }
 
-            String receivedFilePath = "received_file.bmp"; // Path to save the received file
+            String receivedFilePath = fileName; // Use the received file name
             FileOutputStream fileOutputStream = new FileOutputStream(receivedFilePath);
             outputStream.writeTo(fileOutputStream);
 
