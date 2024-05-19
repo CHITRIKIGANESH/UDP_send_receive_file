@@ -1,11 +1,11 @@
-package udp1;
+package udp2;
 
 import java.io.*;
 import java.net.*;
 
-public class Client {
+public class Client2 {
     public static void main(String[] args) {
-        String filePath = "img2.png"; // Path to your file
+        String filePath = "img5.bmp"; // Path to your file
         String host = "127.0.0.1"; // Destination host
         int port = 12345; // Destination port
         int bufferSize = 125; // Adjust buffer size as needed
@@ -19,6 +19,12 @@ public class Client {
             byte[] buffer = new byte[bufferSize];
             int bytesRead;
 
+            // Send the file name first
+            byte[] fileNameBytes = file.getName().getBytes();
+            DatagramPacket fileNamePacket = new DatagramPacket(fileNameBytes, fileNameBytes.length, address, port);
+            socket.send(fileNamePacket);
+
+            // Send the file data
             while ((bytesRead = fileInputStream.read(buffer)) != -1) {
                 DatagramPacket packet = new DatagramPacket(buffer, bytesRead, address, port);
                 socket.send(packet);
